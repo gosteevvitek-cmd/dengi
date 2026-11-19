@@ -14,14 +14,14 @@
 <link rel="icon" href="icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--fix:0px;--tabh:50px;--bg:#17181d;--card:#24252c;--tile:#2a2b33;--btn:#2e2f37;--line:#4a4b55;--text:#f2f2f4;--soft:#e4e4ea;--muted:#a4a4ac;--p:#534AB7;--b:#0F6E56;--inc:#3B6D11;--incT:#C0DD97;--inc2:#97C459;--warn:#FAC775;--warnBg:#412402;--err:#F09595;--top:env(safe-area-inset-top);--bot:min(env(safe-area-inset-bottom),8px)}
+:root{--fix:20px;--tabh:50px;--bg:#17181d;--card:#24252c;--tile:#2a2b33;--btn:#2e2f37;--line:#4a4b55;--text:#f2f2f4;--soft:#e4e4ea;--muted:#a4a4ac;--p:#534AB7;--b:#0F6E56;--inc:#3B6D11;--incT:#C0DD97;--inc2:#97C459;--warn:#FAC775;--warnBg:#412402;--err:#F09595;--top:env(safe-area-inset-top);--bot:min(env(safe-area-inset-bottom),8px)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--text);font-family:'Montserrat',-apple-system,sans-serif;overscroll-behavior:none}
 button,input{font-family:inherit;color:var(--text)}
 button{background:var(--btn);border:1px solid var(--line);border-radius:12px;cursor:pointer}
 button:active{transform:scale(.97)}
 .scr{position:fixed;left:0;right:0;top:0;bottom:calc(var(--tabh) + var(--bot) - var(--fix));overflow-y:auto;padding:calc(var(--top) + 14px) 14px 16px;max-width:560px;margin:0 auto;-webkit-overflow-scrolling:touch}
-.full{bottom:calc(0px - var(--fix));padding-bottom:calc(var(--bot) + 16px)}
+.full{bottom:0;padding-bottom:calc(var(--bot) + 16px)}
 /* категории растягиваются на всю высоту между шапкой и меню */
 #s1{display:flex;flex-direction:column;padding-bottom:4px}
 #s1 .grid{flex:1;align-content:space-evenly}
@@ -29,12 +29,18 @@ button:active{transform:scale(.97)}
 .pan{width:100%;max-width:560px;margin:0 auto;background:#202128;border-radius:22px 22px 0 0;padding:14px 16px calc(var(--bot) + 18px)}
 .cg{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
 .cw{font-size:12px;color:var(--muted);padding:6px 0}
-.cd{height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer}
+.cd{width:44px;height:44px;margin:1px auto;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer}
 .cd.on{background:var(--text);color:var(--bg);font-weight:600}
 .cd.td{box-shadow:inset 0 0 0 2px var(--inc2)}
 .cd.off{color:#55555c;pointer-events:none}
 #save{position:sticky;bottom:6px}
 .sub{font-size:11px;color:var(--muted);line-height:1.45;margin-top:2px;font-weight:400}
+.nm{position:relative;top:5px}
+.ep{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;max-height:200px;overflow-y:auto}
+.ep span{height:40px;display:flex;align-items:center;justify-content:center;font-size:24px;border-radius:10px;cursor:pointer}
+.ep span.on{background:var(--line)}
+#gear{width:34px;height:34px;padding:0;border-radius:50%;font-size:17px}
+.tab span{height:24px;display:flex;align-items:center;justify-content:center}
 body::before{content:"";position:fixed;left:0;right:0;top:0;height:var(--top);background:var(--bg);z-index:6}
 .hid{display:none!important}
 .seg{display:grid;grid-template-columns:1fr 1fr;background:var(--card);border-radius:12px;padding:3px;gap:3px}
@@ -94,16 +100,10 @@ body::before{content:"";position:fixed;left:0;right:0;top:0;height:var(--top);ba
   <div style="font-size:32px;font-weight:600;line-height:1.25" id="tRub">0 ₽</div>
   <div style="font-size:16px;color:#c4c4cc" id="tByn">0 Br</div>
   <div id="pill"></div>
-  <div style="display:flex;gap:8px;justify-content:center;margin-top:10px"><button class="gb" id="inc">+ Доход</button><button class="gb" id="ed">Изменить</button><button class="gb" id="gear" aria-label="Настройки" style="padding:0 12px;font-size:16px">⚙️</button></div>
+  <div style="display:flex;gap:8px;justify-content:center;margin-top:10px"><button class="gb" id="inc">+ Доход</button><button class="gb" id="ed">Изменить</button><button class="gb" id="gear" aria-label="Настройки">⚙️</button></div>
   <div style="font-size:12px;color:var(--muted);margin-top:6px" id="ehint"></div>
  </div>
  <div class="grid" id="grid"></div>
- <div id="form" class="hid" style="margin:10px 0;background:#202128;border-radius:14px;padding:12px">
-  <div style="display:flex;gap:6px"><input class="inp" id="fe" maxlength="8" placeholder="🍍" style="width:60px;text-align:center;font-size:22px;padding:0"><input class="inp" id="fn" maxlength="16" placeholder="Название" style="flex:1"></div>
-  <div class="err" id="ferr" style="text-align:left"></div>
-  <div style="display:flex;gap:6px"><button class="chip" id="fok" style="flex:1">Сохранить</button><button class="chip" id="fno">Отмена</button></div>
-  <div style="font-size:12px;color:var(--muted);margin-top:8px" id="fhint"></div>
- </div>
 </main>
 
 <main class="scr full hid" id="s2">
@@ -162,6 +162,16 @@ body::before{content:"";position:fixed;left:0;right:0;top:0;height:var(--top);ba
  <button class="chip" id="sexp" style="width:100%;margin-top:8px">Скачать резервную копию</button>
  <div style="font-size:12px;color:var(--muted);margin-top:14px;line-height:1.6">Записи хранятся в телефоне и уходят в твою Google Таблицу, когда есть интернет. Без адреса таблицы приложение работает, но записи остаются только в телефоне.</div>
 </main>
+
+<div class="sheet hid" id="form"><div class="pan">
+  <div class="bar3"><span style="width:44px"></span><span style="font-size:17px;font-weight:600" id="ftitle">Категория</span><button class="ic" id="fno" aria-label="Закрыть">×</button></div>
+  <div style="display:flex;gap:8px;margin-top:14px"><input class="inp" id="fe" maxlength="12" placeholder="🍍" style="width:60px;text-align:center;font-size:24px;padding:0"><input class="inp" id="fn" maxlength="16" placeholder="Название" style="flex:1"></div>
+  <div class="lbl">Нажми, чтобы выбрать картинку</div>
+  <div class="ep" id="epick"></div>
+  <div class="err" id="ferr"></div>
+  <button class="chip" id="fok" style="width:100%;height:46px">Сохранить</button>
+  <div style="font-size:12px;color:var(--muted);margin-top:8px;text-align:center" id="fhint"></div>
+ </div></div>
 
 <div class="sheet hid" id="cal">
  <div class="pan">
@@ -292,13 +302,17 @@ function today(){const t=live().filter(e=>e.kind==="out"&&e.date===iso(new Date(
 function syncMode(){[...$("mode").children].forEach(x=>x.classList.toggle("on",x.dataset.m===m))}
 function drawGrid(){
  $("grid").className="grid"+(edit?" edit":"");
- $("grid").innerHTML=CATS[m].map((x,i)=>`<div class="cat${drag&&drag.moved&&drag.i===i?" drag":""}" data-i="${i}"><span class="x" data-del="${i}">×</span><span class="e">${esc(x.e)}</span>${esc(x.n)}</div>`).join("")+`<div class="cat add" id="addc"><span class="e">+</span>Добавить</div>`;
+ $("grid").innerHTML=CATS[m].map((x,i)=>`<div class="cat${drag&&drag.moved&&drag.i===i?" drag":""}" data-i="${i}"><span class="x" data-del="${i}">×</span><span class="e">${esc(x.e)}</span>${esc(x.n)}</div>`).join("")+`<div class="cat add" id="addc"><span class="e"><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M11 3v16M3 11h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>Добавить</div>`;
  $("ed").textContent=edit?"Готово":"Изменить";$("ed").classList.toggle("on",edit);
  $("ehint").textContent=edit?"Тяни иконку на новое место · нажми — переименовать":"";
  syncMode();today();pill()}
-function form(i){fi=i;$("form").classList.remove("hid");$("ferr").textContent="";$("fe").value=i>=0?CATS[m][i].e:"";$("fn").value=i>=0?CATS[m][i].n:"";
+const EMO=["🍽️","🍔","🍕","🍱","🥗","🍣","🍜","☕","🥤","🍺","🍷","🛒","🏠","🛋️","🪑","🔧","🧹","🧴","🚗","🚕","🚇","🚆","✈️","🏨","⛽","🅿️","🧾","💳","💵","💰","📈","🏦","📱","💻","🎧","📷","🎬","🎵","🎯","📢","✂️","🎞️","🍍","🍉","🎁","💝","👶","🐰","👕","👟","💄","💅","💊","🚑","🦷","💪","🎾","🏋️","🎓","📚","🎮","🎟️","🐶","🌿","🧸","👤","🤝","📑","⚙️"];
+function drawEp(){const v=$("fe").value.trim();$("epick").innerHTML=EMO.map(x=>`<span class="${x===v?"on":""}">${x}</span>`).join("")}
+$("epick").onclick=e=>{const t=e.target.closest("span");if(!t)return;$("fe").value=t.textContent;drawEp()};
+$("fe").oninput=drawEp;
+function form(i){fi=i;$("form").classList.remove("hid");$("ftitle").textContent=i>=0?"Изменить категорию":"Новая категория";$("ferr").textContent="";$("fe").value=i>=0?CATS[m][i].e:"";$("fn").value=i>=0?CATS[m][i].n:"";drawEp();
  $("fhint").textContent=i>=0?"Старые записи останутся под прежним названием, в таблице они попадут в «Новые категории».":"Новая категория сама появится в таблице отдельной строкой.";
- setTimeout(()=>$("fn").focus(),50)}
+ if(i<0)setTimeout(()=>$("fn").focus(),50)}
 const closeForm=()=>{$("form").classList.add("hid");fi=-1};
 $("mode").onclick=e=>{const b=e.target.closest("button");if(!b)return;m=b.dataset.m;LAST.mode=m;saveL();closeForm();drawGrid()};
 $("ed").onclick=()=>{edit=!edit;closeForm();drawGrid()};
@@ -320,6 +334,7 @@ $("fok").onclick=()=>{const n=$("fn").value.trim(),em=$("fe").value.trim()||"⚙
  saveC();closeForm();drawGrid();sync()};
 $("fn").oninput=()=>$("ferr").textContent="";
 $("fno").onclick=closeForm;
+$("form").onclick=e=>{if(e.target.id==="form")closeForm()};
 $("gear").onclick=()=>show("ss");
 
 // ---------- экран записи ----------
@@ -418,7 +433,7 @@ function drawAn(){const n=new Date(),ms=new Date(n.getFullYear(),n.getMonth()+am
  const out=M.filter(e=>e.kind==="out"&&(aseg==="all"||e.sphere===aseg));
  const g={};out.forEach(e=>{const key=e.sphere+"|"+e.cat;g[key]=(g[key]||0)+rubOf(e)});
  const rows=Object.entries(g).sort((x,y)=>y[1]-x[1]),mx=rows[0]?.[1]||1;
- $("alist").innerHTML=rows.length?rows.map(([key,s])=>{const [sp2,c]=key.split("|");return `<div class="hr" style="cursor:default"><span class="e">${esc(emo(sp2,c))}</span><div style="flex:1;min-width:0"><div style="display:flex;justify-content:space-between;font-size:14px;gap:8px"><span class="ell">${esc(c)}${c==="Инвестиции"?' <span style="color:var(--muted);font-size:11px">не в расходах</span>':""}</span><span style="text-align:right;white-space:nowrap"><b style="font-weight:600">${f(s)} ₽</b><div class="sub">${alt(s," · ")}</div></span></div><div class="bar" style="width:${Math.max(4,s/mx*100)}%;background:${sp2==="p"?"#7F77DD":"#1D9E75"}"></div></div></div>`}).join(""):'<div style="text-align:center;color:#8e8e96;font-size:13px;padding:30px 0">В этом месяце расходов нет</div>';
+ $("alist").innerHTML=rows.length?rows.map(([key,s])=>{const [sp2,c]=key.split("|");return `<div class="hr" style="cursor:default"><span class="e">${esc(emo(sp2,c))}</span><div style="flex:1;min-width:0"><div style="display:flex;justify-content:space-between;align-items:center;font-size:14px;gap:8px"><span class="ell nm">${esc(c)}${c==="Инвестиции"?' <span style="color:var(--muted);font-size:11px">не в расходах</span>':""}</span><span style="text-align:right;white-space:nowrap"><b style="font-weight:600">${f(s)} ₽</b><div class="sub">${alt(s," · ")}</div></span></div><div class="bar" style="width:${Math.max(4,s/mx*100)}%;background:${sp2==="p"?"#7F77DD":"#1D9E75"}"></div></div></div>`}).join(""):'<div style="text-align:center;color:#8e8e96;font-size:13px;padding:30px 0">В этом месяце расходов нет</div>';
  $("mNext").style.visibility=am<0?"visible":"hidden"}
 $("aseg").onclick=e=>{const b=e.target.closest("button");if(!b)return;[...$("aseg").children].forEach(x=>x.classList.toggle("on",x===b));aseg=b.dataset.a;drawAn()};
 $("mPrev").onclick=()=>{am--;drawAn()};$("mNext").onclick=()=>{if(am<0){am++;drawAn()}};
@@ -427,7 +442,7 @@ $("mPrev").onclick=()=>{am--;drawAn()};$("mNext").onclick=()=>{if(am<0){am++;dra
 function drawSettings(){
  $("surl").value=ST.url||"";
  const n=E.filter(e=>!e.synced||e.del).length,ls=ST.lastSync?new Date(ST.lastSync):null;
- $("sstat").innerHTML=`Версия приложения: <b>10</b><br>Записей в телефоне: <b>${live().length}</b><br>Ждут отправки: <b>${n}</b><br>Последняя отправка: <b>${ls?ls.toLocaleString("ru-RU",{day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"}):"ещё не было"}</b><br>Экран: <b>${innerWidth}×${innerHeight}, iPhone ${screen.width}×${screen.height}, меню ${TABH}</b><br>Курс ЦБ: <b>${RATES.latest?`1 $ = ${fb(RATES.latest.USD)} ₽, 1 Br = ${fb(RATES.latest.BYN)} ₽ (${shortDate(RATES.latest.date)})`:"ещё не загружен"}</b>${syncErr?`<br><span style="color:var(--err)">Ошибка: ${esc(syncErr)}</span>`:""}`}
+ $("sstat").innerHTML=`Версия приложения: <b>12</b><br>Записей в телефоне: <b>${live().length}</b><br>Ждут отправки: <b>${n}</b><br>Последняя отправка: <b>${ls?ls.toLocaleString("ru-RU",{day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"}):"ещё не было"}</b><br>Экран: <b>${innerWidth}×${innerHeight}, iPhone ${screen.width}×${screen.height}, меню ${TABH}</b><br>Курс ЦБ: <b>${RATES.latest?`1 $ = ${fb(RATES.latest.USD)} ₽, 1 Br = ${fb(RATES.latest.BYN)} ₽ (${shortDate(RATES.latest.date)})`:"ещё не загружен"}</b>${syncErr?`<br><span style="color:var(--err)">Ошибка: ${esc(syncErr)}</span>`:""}`}
 $("ssave").onclick=async()=>{const u=$("surl").value.trim();$("serr").textContent="";
  if(u&&!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(u)){$("serr").textContent="Адрес должен начинаться с https://script.google.com/macros/s/ и заканчиваться на /exec";return}
  if(u){try{const r=await fetch(u+"?op=ping");const j=await r.json();if(!j.ok)throw 0}catch(e){$("serr").textContent="Таблица не ответила. Проверь адрес и что доступ открыт «Все»";return}}
