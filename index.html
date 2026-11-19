@@ -14,7 +14,7 @@
 <link rel="icon" href="icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--fix:20px;--tabh:50px;--bg:#17181d;--card:#24252c;--tile:#2a2b33;--btn:#2e2f37;--line:#4a4b55;--text:#f2f2f4;--soft:#e4e4ea;--muted:#a4a4ac;--p:#534AB7;--b:#0F6E56;--inc:#3B6D11;--incT:#C0DD97;--inc2:#97C459;--warn:#FAC775;--warnBg:#412402;--err:#F09595;--top:env(safe-area-inset-top);--bot:min(env(safe-area-inset-bottom),8px)}
+:root{--fix:0px;--tabh:47px;--bg:#17181d;--card:#24252c;--tile:#2a2b33;--btn:#2e2f37;--line:#4a4b55;--text:#f2f2f4;--soft:#e4e4ea;--muted:#a4a4ac;--p:#534AB7;--b:#0F6E56;--inc:#3B6D11;--incT:#C0DD97;--inc2:#97C459;--warn:#FAC775;--warnBg:#412402;--err:#F09595;--top:env(safe-area-inset-top);--bot:0px}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--text);font-family:'Montserrat',-apple-system,sans-serif;overscroll-behavior:none}
 button,input{font-family:inherit;color:var(--text)}
@@ -442,7 +442,7 @@ $("mPrev").onclick=()=>{am--;drawAn()};$("mNext").onclick=()=>{if(am<0){am++;dra
 function drawSettings(){
  $("surl").value=ST.url||"";
  const n=E.filter(e=>!e.synced||e.del).length,ls=ST.lastSync?new Date(ST.lastSync):null;
- $("sstat").innerHTML=`Версия приложения: <b>12</b><br>Записей в телефоне: <b>${live().length}</b><br>Ждут отправки: <b>${n}</b><br>Последняя отправка: <b>${ls?ls.toLocaleString("ru-RU",{day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"}):"ещё не было"}</b><br>Экран: <b>${innerWidth}×${innerHeight}, iPhone ${screen.width}×${screen.height}, меню ${TABH}</b><br>Курс ЦБ: <b>${RATES.latest?`1 $ = ${fb(RATES.latest.USD)} ₽, 1 Br = ${fb(RATES.latest.BYN)} ₽ (${shortDate(RATES.latest.date)})`:"ещё не загружен"}</b>${syncErr?`<br><span style="color:var(--err)">Ошибка: ${esc(syncErr)}</span>`:""}`}
+ $("sstat").innerHTML=`Версия приложения: <b>13</b><br>Записей в телефоне: <b>${live().length}</b><br>Ждут отправки: <b>${n}</b><br>Последняя отправка: <b>${ls?ls.toLocaleString("ru-RU",{day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"}):"ещё не было"}</b><br>Экран: <b>${innerWidth}×${innerHeight}, iPhone ${screen.width}×${screen.height}, меню ${TABH}</b><br>Курс ЦБ: <b>${RATES.latest?`1 $ = ${fb(RATES.latest.USD)} ₽, 1 Br = ${fb(RATES.latest.BYN)} ₽ (${shortDate(RATES.latest.date)})`:"ещё не загружен"}</b>${syncErr?`<br><span style="color:var(--err)">Ошибка: ${esc(syncErr)}</span>`:""}`}
 $("ssave").onclick=async()=>{const u=$("surl").value.trim();$("serr").textContent="";
  if(u&&!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(u)){$("serr").textContent="Адрес должен начинаться с https://script.google.com/macros/s/ и заканчиваться на /exec";return}
  if(u){try{const r=await fetch(u+"?op=ping");const j=await r.json();if(!j.ok)throw 0}catch(e){$("serr").textContent="Таблица не ответила. Проверь адрес и что доступ открыт «Все»";return}}
