@@ -34,6 +34,7 @@ button:active{transform:scale(.97)}
 .cd.td{box-shadow:inset 0 0 0 2px var(--inc2)}
 .cd.off{color:#55555c;pointer-events:none}
 #save{position:sticky;bottom:6px}
+.sub{font-size:11px;color:var(--muted);line-height:1.45;margin-top:2px;font-weight:400}
 body::before{content:"";position:fixed;left:0;right:0;top:0;height:var(--top);background:var(--bg);z-index:6}
 .hid{display:none!important}
 .seg{display:grid;grid-template-columns:1fr 1fr;background:var(--card);border-radius:12px;padding:3px;gap:3px}
@@ -141,9 +142,9 @@ body::before{content:"";position:fixed;left:0;right:0;top:0;height:var(--top);ba
   <div style="text-align:right;font-size:13px;color:var(--inc2);line-height:1.6"><div id="aInB"></div><div id="aInU"></div></div>
  </div>
  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:8px">
-  <div class="card"><div style="font-size:11px;color:var(--muted)">Личное</div><div style="font-size:15px;font-weight:600" id="aP"></div></div>
-  <div class="card"><div style="font-size:11px;color:var(--muted)">Бизнес</div><div style="font-size:15px;font-weight:600" id="aB"></div></div>
-  <div class="card"><div style="font-size:11px;color:var(--muted)">Остаток</div><div style="font-size:15px;font-weight:600" id="aRest"></div></div>
+  <div class="card"><div style="font-size:11px;color:var(--muted)">Личное</div><div style="font-size:15px;font-weight:600" id="aP"></div><div class="sub" id="aPx"></div></div>
+  <div class="card"><div style="font-size:11px;color:var(--muted)">Бизнес</div><div style="font-size:15px;font-weight:600" id="aB"></div><div class="sub" id="aBx"></div></div>
+  <div class="card"><div style="font-size:11px;color:var(--muted)">Остаток</div><div style="font-size:15px;font-weight:600" id="aRest"></div><div class="sub" id="aRestx"></div></div>
  </div>
  <div class="seg s3" id="aseg" style="margin-top:12px"><button data-a="p" class="on">Личное</button><button data-a="b">Бизнес</button><button data-a="all">Все расходы</button></div>
  <div id="alist" style="margin-top:6px"></div>
@@ -411,11 +412,13 @@ function drawAn(){const n=new Date(),ms=new Date(n.getFullYear(),n.getMonth()+am
  const si=sum(M.filter(e=>e.kind==="in")),sp=sum(M.filter(e=>e.kind==="out"&&e.sphere==="p"&&e.cat!=="Инвестиции")),sbz=sum(M.filter(e=>e.kind==="out"&&e.sphere==="b")),rest=si-sp-sbz;
  const br=RATES.latest&&RATES.latest.BYN,us=RATES.latest&&RATES.latest.USD;
  $("aIn").textContent="+"+f(si)+" ₽";$("aInB").textContent=br?fb(si/br)+" Br":"";$("aInU").textContent=us?f(si/us)+" $":"";
- $("aP").textContent=f(sp)+" ₽";$("aB").textContent=f(sbz)+" ₽";$("aRest").textContent=(rest<0?"−":"")+f(Math.abs(rest))+" ₽";$("aRest").style.color=rest<0?"var(--err)":"var(--incT)";
+ $("aP").textContent=f(sp)+" ₽";
+ const alt=(v,sep)=>br&&us?`${v<0?"−":""}${fb(Math.abs(v)/br)} Br${sep}${v<0?"−":""}${f(Math.abs(v)/us)} $`:"";
+ $("aPx").innerHTML=alt(sp,"<br>");$("aBx").innerHTML=alt(sbz,"<br>");$("aRestx").innerHTML=alt(rest,"<br>");$("aB").textContent=f(sbz)+" ₽";$("aRest").textContent=(rest<0?"−":"")+f(Math.abs(rest))+" ₽";$("aRest").style.color=rest<0?"var(--err)":"var(--incT)";
  const out=M.filter(e=>e.kind==="out"&&(aseg==="all"||e.sphere===aseg));
  const g={};out.forEach(e=>{const key=e.sphere+"|"+e.cat;g[key]=(g[key]||0)+rubOf(e)});
  const rows=Object.entries(g).sort((x,y)=>y[1]-x[1]),mx=rows[0]?.[1]||1;
- $("alist").innerHTML=rows.length?rows.map(([key,s])=>{const [sp2,c]=key.split("|");return `<div class="hr" style="cursor:default"><span class="e">${esc(emo(sp2,c))}</span><div style="flex:1;min-width:0"><div style="display:flex;justify-content:space-between;font-size:14px;gap:8px"><span class="ell">${esc(c)}${c==="Инвестиции"?' <span style="color:var(--muted);font-size:11px">не в расходах</span>':""}</span><span style="font-weight:600;white-space:nowrap">${f(s)} ₽</span></div><div class="bar" style="width:${Math.max(4,s/mx*100)}%;background:${sp2==="p"?"#7F77DD":"#1D9E75"}"></div></div></div>`}).join(""):'<div style="text-align:center;color:#8e8e96;font-size:13px;padding:30px 0">В этом месяце расходов нет</div>';
+ $("alist").innerHTML=rows.length?rows.map(([key,s])=>{const [sp2,c]=key.split("|");return `<div class="hr" style="cursor:default"><span class="e">${esc(emo(sp2,c))}</span><div style="flex:1;min-width:0"><div style="display:flex;justify-content:space-between;font-size:14px;gap:8px"><span class="ell">${esc(c)}${c==="Инвестиции"?' <span style="color:var(--muted);font-size:11px">не в расходах</span>':""}</span><span style="text-align:right;white-space:nowrap"><b style="font-weight:600">${f(s)} ₽</b><div class="sub">${alt(s," · ")}</div></span></div><div class="bar" style="width:${Math.max(4,s/mx*100)}%;background:${sp2==="p"?"#7F77DD":"#1D9E75"}"></div></div></div>`}).join(""):'<div style="text-align:center;color:#8e8e96;font-size:13px;padding:30px 0">В этом месяце расходов нет</div>';
  $("mNext").style.visibility=am<0?"visible":"hidden"}
 $("aseg").onclick=e=>{const b=e.target.closest("button");if(!b)return;[...$("aseg").children].forEach(x=>x.classList.toggle("on",x===b));aseg=b.dataset.a;drawAn()};
 $("mPrev").onclick=()=>{am--;drawAn()};$("mNext").onclick=()=>{if(am<0){am++;drawAn()}};
@@ -424,7 +427,7 @@ $("mPrev").onclick=()=>{am--;drawAn()};$("mNext").onclick=()=>{if(am<0){am++;dra
 function drawSettings(){
  $("surl").value=ST.url||"";
  const n=E.filter(e=>!e.synced||e.del).length,ls=ST.lastSync?new Date(ST.lastSync):null;
- $("sstat").innerHTML=`Версия приложения: <b>9</b><br>Записей в телефоне: <b>${live().length}</b><br>Ждут отправки: <b>${n}</b><br>Последняя отправка: <b>${ls?ls.toLocaleString("ru-RU",{day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"}):"ещё не было"}</b><br>Экран: <b>${innerWidth}×${innerHeight}, iPhone ${screen.width}×${screen.height}, меню ${TABH}</b><br>Курс ЦБ: <b>${RATES.latest?`1 $ = ${fb(RATES.latest.USD)} ₽, 1 Br = ${fb(RATES.latest.BYN)} ₽ (${shortDate(RATES.latest.date)})`:"ещё не загружен"}</b>${syncErr?`<br><span style="color:var(--err)">Ошибка: ${esc(syncErr)}</span>`:""}`}
+ $("sstat").innerHTML=`Версия приложения: <b>10</b><br>Записей в телефоне: <b>${live().length}</b><br>Ждут отправки: <b>${n}</b><br>Последняя отправка: <b>${ls?ls.toLocaleString("ru-RU",{day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"}):"ещё не было"}</b><br>Экран: <b>${innerWidth}×${innerHeight}, iPhone ${screen.width}×${screen.height}, меню ${TABH}</b><br>Курс ЦБ: <b>${RATES.latest?`1 $ = ${fb(RATES.latest.USD)} ₽, 1 Br = ${fb(RATES.latest.BYN)} ₽ (${shortDate(RATES.latest.date)})`:"ещё не загружен"}</b>${syncErr?`<br><span style="color:var(--err)">Ошибка: ${esc(syncErr)}</span>`:""}`}
 $("ssave").onclick=async()=>{const u=$("surl").value.trim();$("serr").textContent="";
  if(u&&!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(u)){$("serr").textContent="Адрес должен начинаться с https://script.google.com/macros/s/ и заканчиваться на /exec";return}
  if(u){try{const r=await fetch(u+"?op=ping");const j=await r.json();if(!j.ok)throw 0}catch(e){$("serr").textContent="Таблица не ответила. Проверь адрес и что доступ открыт «Все»";return}}
