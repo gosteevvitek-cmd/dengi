@@ -1,5 +1,5 @@
 // Кэш приложения: работает без интернета. Меняй VERSION при каждом обновлении файлов.
-const VERSION = "dengi-v7";
+const VERSION = "dengi-v8";
 const SHELL = ["./", "index.html", "manifest.json", "icon-180.png", "icon-192.png", "icon-512.png"];
 
 self.addEventListener("install", e => {
