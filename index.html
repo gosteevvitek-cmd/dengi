@@ -14,14 +14,14 @@
 <link rel="icon" href="icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--fix:0px;--tabh:58px;--bg:#17181d;--card:#24252c;--tile:#2a2b33;--btn:#2e2f37;--line:#4a4b55;--text:#f2f2f4;--soft:#e4e4ea;--muted:#a4a4ac;--p:#534AB7;--b:#0F6E56;--inc:#3B6D11;--incT:#C0DD97;--inc2:#97C459;--warn:#FAC775;--warnBg:#412402;--err:#F09595;--top:env(safe-area-inset-top);--bot:env(safe-area-inset-bottom)}
+:root{--tabh:50px;--bg:#17181d;--card:#24252c;--tile:#2a2b33;--btn:#2e2f37;--line:#4a4b55;--text:#f2f2f4;--soft:#e4e4ea;--muted:#a4a4ac;--p:#534AB7;--b:#0F6E56;--inc:#3B6D11;--incT:#C0DD97;--inc2:#97C459;--warn:#FAC775;--warnBg:#412402;--err:#F09595;--top:env(safe-area-inset-top);--bot:min(env(safe-area-inset-bottom),18px)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--text);font-family:'Montserrat',-apple-system,sans-serif;overscroll-behavior:none}
 button,input{font-family:inherit;color:var(--text)}
 button{background:var(--btn);border:1px solid var(--line);border-radius:12px;cursor:pointer}
 button:active{transform:scale(.97)}
-.scr{position:fixed;left:0;right:0;top:0;bottom:calc(var(--tabh) + var(--bot) - var(--fix));overflow-y:auto;padding:calc(var(--top) + 10px) 14px 16px;max-width:560px;margin:0 auto;-webkit-overflow-scrolling:touch}
-.full{bottom:calc(0px - var(--fix));padding-bottom:calc(var(--bot) + 16px)}
+.scr{position:fixed;left:0;right:0;top:0;bottom:calc(var(--tabh) + var(--bot));overflow-y:auto;padding:calc(var(--top) + 26px) 14px 16px;max-width:560px;margin:0 auto;-webkit-overflow-scrolling:touch}
+.full{bottom:calc(0px);padding-bottom:calc(var(--bot) + 16px)}
 body::before{content:"";position:fixed;left:0;right:0;top:0;height:var(--top);background:var(--bg);z-index:6}
 .hid{display:none!important}
 .seg{display:grid;grid-template-columns:1fr 1fr;background:var(--card);border-radius:12px;padding:3px;gap:3px}
@@ -54,9 +54,9 @@ body::before{content:"";position:fixed;left:0;right:0;top:0;height:var(--top);ba
 .d.on b{color:var(--bg)}
 .lbl{font-size:13px;color:var(--muted);margin:10px 0 6px}
 .sug{display:inline-block;border:1px solid var(--line);border-radius:14px;padding:4px 10px;font-size:13px;margin:6px 4px 0 0;cursor:pointer;color:var(--soft)}
-.tabs{position:fixed;left:0;right:0;bottom:calc(0px - var(--fix));height:calc(var(--tabh) + var(--bot));padding-bottom:var(--bot);border-top:1px solid var(--btn);display:grid;grid-template-columns:1fr 1fr 1fr;background:var(--bg);z-index:5}
-.tab{display:flex;flex-direction:column;align-items:center;padding-top:7px;gap:2px;font-size:11px;color:#7a7a83;cursor:pointer}
-.tab span{font-size:22px;filter:grayscale(1);opacity:.6}
+.tabs{position:fixed;left:0;right:0;bottom:calc(0px);height:calc(var(--tabh) + var(--bot));padding-bottom:var(--bot);border-top:1px solid var(--btn);display:grid;grid-template-columns:1fr 1fr 1fr;background:var(--bg);z-index:5}
+.tab{display:flex;flex-direction:column;align-items:center;padding-top:6px;gap:1px;font-size:11px;color:#7a7a83;cursor:pointer}
+.tab span{font-size:20px;filter:grayscale(1);opacity:.6}
 .tab.on{color:#fff}.tab.on span{filter:none;opacity:1}
 .hr{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #26272e;cursor:pointer}
 .hr .e{font-size:22px;width:46px;height:46px;border-radius:50%;background:var(--tile);display:flex;align-items:center;justify-content:center;flex:0 0 46px}
@@ -408,18 +408,6 @@ function show(id){["s1","s2","sh","sa","ss"].forEach(s=>$(s).classList.toggle("h
  if(id==="sh")drawHist();if(id==="sa")drawAn();if(id==="s1"){edit=false;closeForm();drawGrid()}if(id==="ss")drawSettings();
  $(id).scrollTop=0}
 $("tabs").onclick=e=>{const t=e.target.closest(".tab");if(!t)return;if(t.dataset.t==="sh"){hf="all";syncH()}if(t.dataset.t==="sa")am=0;show(t.dataset.t)};
-
-// ---------- высота экрана ----------
-// В приложении с экрана «Домой» iOS иногда делает окно короче экрана на высоту статус-бара,
-// и снизу остаётся пустая полоса. Меряем разницу и растягиваем нижние элементы до края.
-function fitScreen(){
- const st=navigator.standalone||matchMedia("(display-mode: standalone)").matches;
- const portrait=innerHeight>innerWidth;
- let d=st&&portrait?Math.max(screen.height,screen.width)-innerHeight:0;
- if(d<0||d>120)d=0;
- document.documentElement.style.setProperty("--fix",d+"px");
-}
-fitScreen();addEventListener("resize",fitScreen);addEventListener("orientationchange",()=>setTimeout(fitScreen,300));
 
 // ---------- старт ----------
 if(!localStorage.getItem("d_cats"))saveC();
