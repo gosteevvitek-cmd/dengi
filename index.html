@@ -25,6 +25,15 @@ button:active{transform:scale(.97)}
 /* категории растягиваются на всю высоту между шапкой и меню */
 #s1{display:flex;flex-direction:column;padding-bottom:4px}
 #s1 .grid{flex:1;align-content:space-evenly}
+.sheet{position:fixed;left:0;right:0;top:0;bottom:0;background:rgba(0,0,0,.55);z-index:20;display:flex;align-items:flex-end}
+.pan{width:100%;max-width:560px;margin:0 auto;background:#202128;border-radius:22px 22px 0 0;padding:14px 16px calc(var(--bot) + 18px)}
+.cg{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.cw{font-size:12px;color:var(--muted);padding:6px 0}
+.cd{height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer}
+.cd.on{background:var(--text);color:var(--bg);font-weight:600}
+.cd.td{box-shadow:inset 0 0 0 2px var(--inc2)}
+.cd.off{color:#55555c;pointer-events:none}
+#save{position:sticky;bottom:6px}
 body::before{content:"";position:fixed;left:0;right:0;top:0;height:var(--top);background:var(--bg);z-index:6}
 .hid{display:none!important}
 .seg{display:grid;grid-template-columns:1fr 1fr;background:var(--card);border-radius:12px;padding:3px;gap:3px}
@@ -111,7 +120,6 @@ body::before{content:"";position:fixed;left:0;right:0;top:0;height:var(--top);ba
  <div class="lbl">Валюта</div><div style="display:flex;gap:6px" id="cur"></div>
  <div class="lbl" id="wlbl">Чем платишь?</div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px" id="wal"></div>
  <div class="lbl">Дата</div><div style="display:flex;gap:6px" id="dates"></div>
- <input type="date" id="dpick" style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px">
  <input class="inp" id="note" placeholder="Комментарий" style="margin-top:10px" autocomplete="off">
  <div class="err" id="err"></div>
  <div class="pad" id="pad"></div>
@@ -153,6 +161,15 @@ body::before{content:"";position:fixed;left:0;right:0;top:0;height:var(--top);ba
  <button class="chip" id="sexp" style="width:100%;margin-top:8px">Скачать резервную копию</button>
  <div style="font-size:12px;color:var(--muted);margin-top:14px;line-height:1.6">Записи хранятся в телефоне и уходят в твою Google Таблицу, когда есть интернет. Без адреса таблицы приложение работает, но записи остаются только в телефоне.</div>
 </main>
+
+<div class="sheet hid" id="cal">
+ <div class="pan">
+  <div class="bar3"><span style="width:44px"></span><span style="font-size:17px;font-weight:600">Выбери дату</span><button class="ic" id="calX" aria-label="Закрыть">×</button></div>
+  <div class="top" style="margin:14px 0 6px"><button class="ic" id="calP" aria-label="Предыдущий месяц">‹</button><span style="font-size:17px;font-weight:600" id="calT"></span><button class="ic" id="calN" aria-label="Следующий месяц">›</button></div>
+  <div class="cg"><div class="cw">ПН</div><div class="cw">ВТ</div><div class="cw">СР</div><div class="cw">ЧТ</div><div class="cw">ПТ</div><div class="cw">СБ</div><div class="cw">ВС</div></div>
+  <div class="cg" id="calG"></div>
+ </div>
+</div>
 
 <nav class="tabs" id="tabs">
  <div class="tab" data-t="sa"><span>📊</span>Аналитика</div>
@@ -306,9 +323,10 @@ $("gear").onclick=()=>show("ss");
 
 // ---------- экран записи ----------
 let k="out",a="0",cat="",wi=0,cur=LAST.cur||"BYN",selDate=iso(new Date()),editing=null,itype=INC_TYPES[0],ret="s1";
+function fmtA(x){const [i,fr]=x.split(".");return Number(i).toLocaleString("ru-RU")+(x.includes(".")?","+fr:"")}
 function last5(){return[...Array(5)].map((_,i)=>{const d=new Date();d.setDate(d.getDate()-4+i);return iso(d)})}
 function draw2(){
- $("amt").textContent=(k==="in"?"+":"")+a+" "+SYM[cur];$("amt").style.color=k==="in"?"var(--incT)":"var(--text)";
+ $("amt").textContent=(k==="in"?"+":"")+fmtA(a)+" "+SYM[cur];$("amt").style.color=k==="in"?"var(--incT)":"var(--text)";
  const v=parseFloat(a)||0,r=rateNow(cur,selDate),rd=RATES.latest?shortDate(RATES.latest.date):"";
  if(cur==="RUB"){const br=rateNow("BYN",selDate).rate;$("conv").textContent=br?"≈ "+fb(v/br)+" Br":""}
  else if(!r.rate)$("conv").textContent="Курс подтянется, когда появится интернет";
@@ -329,9 +347,24 @@ $("itype").onclick=e=>{const b=e.target.closest("button");if(b){itype=b.dataset.
 $("fsug").onclick=e=>{const s=e.target.closest(".sug");if(s){$("from").value=s.dataset.p;$("err").textContent=""}};
 $("cur").onclick=e=>{const b=e.target.closest("button");if(!b)return;cur=b.dataset.c;draw2()};
 $("wal").onclick=e=>{const w=e.target.closest(".w");if(!w)return;wi=+w.dataset.i;draw2()};
-$("dates").onclick=e=>{if(e.target.closest("#dmore")){const p=$("dpick");p.value=selDate;p.max=iso(new Date());if(p.showPicker)try{p.showPicker()}catch(x){p.click()}else p.click();return}
+$("dates").onclick=e=>{if(e.target.closest("#dmore")){openCal();return}
  const d=e.target.closest(".d[data-s]");if(d){selDate=d.dataset.s;draw2()}};
-$("dpick").onchange=()=>{if($("dpick").value){selDate=$("dpick").value;draw2()}};
+
+// ---------- календарь ----------
+let calM=null;
+function openCal(){const d=fromIso(selDate);calM=new Date(d.getFullYear(),d.getMonth(),1);drawCal();$("cal").classList.remove("hid")}
+function drawCal(){
+ const now=new Date(),td=iso(now),y=calM.getFullYear(),mo=calM.getMonth(),n=new Date(y,mo+1,0).getDate(),off=(calM.getDay()+6)%7;
+ $("calT").textContent=MF[mo]+" "+y;
+ $("calN").style.visibility=(y<now.getFullYear()||(y===now.getFullYear()&&mo<now.getMonth()))?"visible":"hidden";
+ let h="";for(let i=0;i<off;i++)h+="<div></div>";
+ for(let d=1;d<=n;d++){const s=y+"-"+p2(mo+1)+"-"+p2(d);h+=`<div class="cd${s===selDate?" on":""}${s===td?" td":""}${s>td?" off":""}" data-s="${s}">${d}</div>`}
+ $("calG").innerHTML=h}
+$("calP").onclick=()=>{calM=new Date(calM.getFullYear(),calM.getMonth()-1,1);drawCal()};
+$("calN").onclick=()=>{calM=new Date(calM.getFullYear(),calM.getMonth()+1,1);drawCal()};
+$("calX").onclick=()=>$("cal").classList.add("hid");
+$("cal").onclick=e=>{if(e.target.id==="cal")$("cal").classList.add("hid")};
+$("calG").onclick=e=>{const c=e.target.closest(".cd[data-s]");if(!c)return;selDate=c.dataset.s;$("cal").classList.add("hid");draw2()};
 $("pad").innerHTML=["1","2","3","4","5","6","7","8","9",".","0","⌫"].map(x=>`<button>${x}</button>`).join("");
 $("pad").onclick=e=>{if(e.target.tagName!=="BUTTON")return;const t=e.target.textContent;$("err").textContent="";
  if(t==="⌫")a=a.length>1?a.slice(0,-1):"0";else if(t==="."){if(!a.includes("."))a+="."}else{if(a.includes(".")&&a.split(".")[1].length>=2)return;if(a.replace(".","").length>=10)return;a=a==="0"?t:a+t}draw2()};
@@ -391,7 +424,7 @@ $("mPrev").onclick=()=>{am--;drawAn()};$("mNext").onclick=()=>{if(am<0){am++;dra
 function drawSettings(){
  $("surl").value=ST.url||"";
  const n=E.filter(e=>!e.synced||e.del).length,ls=ST.lastSync?new Date(ST.lastSync):null;
- $("sstat").innerHTML=`Версия приложения: <b>8</b><br>Записей в телефоне: <b>${live().length}</b><br>Ждут отправки: <b>${n}</b><br>Последняя отправка: <b>${ls?ls.toLocaleString("ru-RU",{day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"}):"ещё не было"}</b><br>Экран: <b>${innerWidth}×${innerHeight}, iPhone ${screen.width}×${screen.height}, меню ${TABH}</b><br>Курс ЦБ: <b>${RATES.latest?`1 $ = ${fb(RATES.latest.USD)} ₽, 1 Br = ${fb(RATES.latest.BYN)} ₽ (${shortDate(RATES.latest.date)})`:"ещё не загружен"}</b>${syncErr?`<br><span style="color:var(--err)">Ошибка: ${esc(syncErr)}</span>`:""}`}
+ $("sstat").innerHTML=`Версия приложения: <b>9</b><br>Записей в телефоне: <b>${live().length}</b><br>Ждут отправки: <b>${n}</b><br>Последняя отправка: <b>${ls?ls.toLocaleString("ru-RU",{day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"}):"ещё не было"}</b><br>Экран: <b>${innerWidth}×${innerHeight}, iPhone ${screen.width}×${screen.height}, меню ${TABH}</b><br>Курс ЦБ: <b>${RATES.latest?`1 $ = ${fb(RATES.latest.USD)} ₽, 1 Br = ${fb(RATES.latest.BYN)} ₽ (${shortDate(RATES.latest.date)})`:"ещё не загружен"}</b>${syncErr?`<br><span style="color:var(--err)">Ошибка: ${esc(syncErr)}</span>`:""}`}
 $("ssave").onclick=async()=>{const u=$("surl").value.trim();$("serr").textContent="";
  if(u&&!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(u)){$("serr").textContent="Адрес должен начинаться с https://script.google.com/macros/s/ и заканчиваться на /exec";return}
  if(u){try{const r=await fetch(u+"?op=ping");const j=await r.json();if(!j.ok)throw 0}catch(e){$("serr").textContent="Таблица не ответила. Проверь адрес и что доступ открыт «Все»";return}}
