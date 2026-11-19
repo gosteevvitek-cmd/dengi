@@ -1,5 +1,5 @@
 // Кэш приложения: работает без интернета. Меняй VERSION при каждом обновлении файлов.
-const VERSION = "dengi-v6";
+const VERSION = "dengi-v7";
 const SHELL = ["./", "index.html", "manifest.json", "icon-180.png", "icon-192.png", "icon-512.png"];
 
 self.addEventListener("install", e => {
@@ -22,7 +22,8 @@ self.addEventListener("fetch", e => {
   }
   // Само приложение: сначала сеть (чтобы приходили обновления), без сети — кэш
   if (url.origin === location.origin) {
-    e.respondWith(fetch(e.request).then(r => {
+    // no-cache: GitHub кэширует файлы на 10 минут — просим всегда сверяться с сервером
+    e.respondWith(fetch(e.request, { cache: "no-cache" }).then(r => {
       const copy = r.clone();
       caches.open(VERSION).then(c => c.put(e.request, copy));
       return r;
